@@ -2,6 +2,7 @@ import { Router } from "express";
 import userSchema from '../Schemas/userSchema.mjs';
 import bcrypt from 'bcrypt';
 import sendEmail from "../Utils/mailSender.mjs";
+import jwt from 'jsonwebtoken'
 import { generateToken, generateRefreshToken, generateConfirmEmailToken } from "../Utils/Tokens.mjs";
 
 const router = Router();
