@@ -5,6 +5,11 @@ import sendEmail from "../Utils/mailSender.mjs";
 import jwt from 'jsonwebtoken'
 import { generateToken, generateRefreshToken, generateConfirmEmailToken } from "../Utils/Tokens.mjs";
 
+const secretKey = 'w5Y;1JOZ~,Ml;Mj0F|Xh)o}Y0f>RWY]s!&7=WLpo|Brqri0f/D{1k$S{"F7&e.:';
+const refreshSecretKey = 'anotherSecretKeyForRefreshTokens';
+const emailConfirmSecretKey = 'differentSecretKeyForEmailConfirmation';
+
+
 const router = Router();
 
 router.post('/register', async (req, res) => {
