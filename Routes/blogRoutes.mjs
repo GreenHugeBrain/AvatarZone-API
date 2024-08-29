@@ -98,4 +98,35 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.post('/user-loader', async (req, res) => { 
+    const { token } = req.body;
+    
+    if (!token) return res.status(404).send({ message: "Token not provided" });
+    
+    try {
+        const decoded = jwt.verify(token, secretKey);
+        const { email } = decoded;
+
+        const user = await userSchema.findOne({ email });
+        
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
+        res.status(200).send(user); 
+    } catch (error) {
+        console.error('Error loading user:', error);
+
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(400).send('Invalid token');
+        }
+        if (error.name === 'TokenExpiredError') {
+            return res.status(400).send('Token has expired');
+        }
+
+        res.status(500).send('Internal server error');
+    }
+});
+
+
 export default router;
