@@ -2,13 +2,13 @@ import { Router } from "express";
 import userSchema from '../Schemas/userSchema.mjs';
 import bcrypt from 'bcrypt';
 import sendEmail from "../Utils/mailSender.mjs";
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 import { generateToken, generateRefreshToken, generateConfirmEmailToken } from "../Utils/Tokens.mjs";
+import { authenticateToken } from '../middleware/authMiddleware.mjs'; // Import the middleware
 
 const secretKey = 'w5Y;1JOZ~,Ml;Mj0F|Xh)o}Y0f>RWY]s!&7=WLpo|Brqri0f/D{1k$S{"F7&e.:';
 const refreshSecretKey = 'anotherSecretKeyForRefreshTokens';
 const emailConfirmSecretKey = 'differentSecretKeyForEmailConfirmation';
-
 
 const router = Router();
 
@@ -98,18 +98,11 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/user-loader', async (req, res) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).send({ message: "Token not provided" });
-    }
+// Apply middleware to protected routes
+router.get('/user-loader', authenticateToken, async (req, res) => {
+    const { email } = req.user;
 
     try {
-        const decoded = jwt.verify(token, secretKey);
-        const { email } = decoded;
-
         const user = await userSchema.findOne({ email });
 
         if (!user) {
@@ -135,13 +128,21 @@ router.get('/user-loader', async (req, res) => {
     }
 });
 
-router.post('/adminpanel', async (req, res) => {
-    const users = await userSchema.find()
-    res.send(users)
-})
+router.post('/adminpanel', authenticateToken, async (req, res) => {
+    if (!req.user.isAdmin) {
+        return res.status(403).send('Access denied');
+    }
 
+    try {
+        const users = await userSchema.find();
+        res.status(200).send(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).send('Internal server error');
+    }
+});
 
-router.post('/permissions', async (req, res) => {
+router.post('/permissions', authenticateToken, async (req, res) => {
     const { userId, permType } = req.body;
 
     if (!userId || !permType) {
@@ -177,6 +178,5 @@ router.post('/permissions', async (req, res) => {
         res.status(500).json({ error: 'Internal server error.' });
     }
 });
-
 
 export default router;
