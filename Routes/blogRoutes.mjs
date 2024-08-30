@@ -98,22 +98,29 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.post('/user-loader', async (req, res) => { 
-    const { token } = req.body;
-    
-    if (!token) return res.status(404).send({ message: "Token not provided" });
-    
+router.get('/user-loader', async (req, res) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).send({ message: "Token not provided" }); // Unauthorized
+    }
+
     try {
         const decoded = jwt.verify(token, secretKey);
         const { email } = decoded;
 
         const user = await userSchema.findOne({ email });
-        
+
         if (!user) {
             return res.status(404).send({ message: "User not found" });
         }
 
-        res.status(200).send(user); 
+        res.status(200).json({
+            username: user.username,
+            email: user.email,
+            dateOfBirth: user.dateOfBirth
+        });
     } catch (error) {
         console.error('Error loading user:', error);
 
