@@ -141,5 +141,42 @@ router.post('/adminpanel', async (req, res) => {
 })
 
 
+router.post('/permissions', async (req, res) => {
+    const { userId, permType } = req.body;
+
+    if (!userId || !permType) {
+        return res.status(400).json({ error: 'User ID and permission type are required.' });
+    }
+
+    try {
+        const user = await userSchema.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        let updateField = null;
+        switch (permType) {
+            case 'basicProduct':
+                updateField = { basicProduct: true };
+                break;
+            case 'standartProduct':
+                updateField = { standartProduct: true };
+                break;
+            case 'premiumProduct':
+                updateField = { premiumProduct: true };
+                break;
+            default:
+                return res.status(400).json({ error: 'Invalid permission type.' });
+        }
+
+        await userSchema.findByIdAndUpdate(userId, { $set: updateField }, { new: true });
+
+        res.status(200).json({ message: 'Permission updated successfully.' });
+    } catch (error) {
+        console.error('Error updating permission:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 
 export default router;
