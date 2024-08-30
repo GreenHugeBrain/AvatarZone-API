@@ -3,7 +3,7 @@ import userSchema from '../Schemas/userSchema.mjs';
 import bcrypt from 'bcrypt';
 import sendEmail from "../Utils/mailSender.mjs";
 import jwt from 'jsonwebtoken';
-import { generateToken, generateRefreshToken, generateConfirmEmailToken } from "../Utils/Tokens.mjs";
+import { generateToken, generateRefreshToken, generateConfirmEmailToken, verifyRefreshToken } from "../Utils/Tokens.mjs";
 import { authenticateToken } from '../middleware/authMiddleware.mjs'; // Import the middleware
 
 const secretKey = 'w5Y;1JOZ~,Ml;Mj0F|Xh)o}Y0f>RWY]s!&7=WLpo|Brqri0f/D{1k$S{"F7&e.:';
@@ -176,6 +176,43 @@ router.post('/permissions', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Error updating permission:', error);
         res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
+router.post('/refresh-token', async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(401).send({ message: "Refresh token not provided" });
+    }
+
+    try {
+        const decoded = await verifyRefreshToken(refreshToken);
+        const { email } = decoded;
+
+        // Verify user existence
+        const user = await userSchema.findOne({ email });
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
+        // Generate new access token and refresh token
+        const newToken = generateToken({ email });
+        const newRefreshToken = generateRefreshToken({ email });
+
+        res.status(200).send({
+            token: newToken,
+            refreshToken: newRefreshToken
+        });
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(400).send('Invalid refresh token');
+        }
+        if (error.name === 'TokenExpiredError') {
+            return res.status(400).send('Refresh token has expired');
+        }
+        console.error('Error refreshing token:', error);
+        res.status(500).send('Internal server error');
     }
 });
 
