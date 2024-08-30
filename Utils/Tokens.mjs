@@ -7,7 +7,7 @@ const refreshSecretKey = 'anotherSecretKeyForRefreshTokens';
 const emailConfirmSecretKey = 'differentSecretKeyForEmailConfirmation';
 
 export const generateToken = (payload) => {
-    return jwt.sign(payload, secretKey, { expiresIn: '15m' }); 
+    return jwt.sign(payload, secretKey, { expiresIn: '1m' }); 
 };
 
 export const generateRefreshToken = (payload) => {
