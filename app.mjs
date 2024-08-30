@@ -9,7 +9,7 @@ const app = express();
 const port = 3000;
 
 // Middleware
-app.use(cors({ origin: 'http://127.0.0.1:5500', credentials: true })); // Handle CORS
+app.use(cors({ origin: 'https://greenhugebrain.github.io', credentials: true })); // Handle CORS
 app.use(express.json());
 app.use(cookieParser());
 app.use(Routes);
