@@ -103,7 +103,7 @@ router.get('/user-loader', async (req, res) => {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        return res.status(401).send({ message: "Token not provided" }); // Unauthorized
+        return res.status(401).send({ message: "Token not provided" });
     }
 
     try {
@@ -134,6 +134,12 @@ router.get('/user-loader', async (req, res) => {
         res.status(500).send('Internal server error');
     }
 });
+
+router.post('/adminpanel', async (req, res) => {
+    const users = await userSchema.find()
+    res.send(users)
+})
+
 
 
 export default router;

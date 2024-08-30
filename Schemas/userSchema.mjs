@@ -28,7 +28,22 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-
+    basicProduct: {
+        type: Boolean,
+        default: false
+    },
+    standartProduct: {
+        type: Boolean,
+        default: false
+    },
+    premiumProduct: {
+        type: Boolean,
+        default: false
+    },
+    proProduct: {
+        type: Boolean,
+        default: false
+    },
     dateOfBirth: {
         type: String,
         required: true
