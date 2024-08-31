@@ -216,4 +216,24 @@ router.post('/refresh-token', async (req, res) => {
     }
 });
 
+router.get('/api/listings', async (req, res) => {
+    const apiKey = 'NqsXK0DnQA9zGQu90_vXyVDXnyPJq3qB'; // REAL API KEY 
+    const url = 'https://csfloat.com/api/v1/listings';
+
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Forward the response data from CSFloat to the client
+        res.json(response.data);
+    } catch (error) {
+        console.error('Error fetching listings:', error);
+        res.status(500).json({ error: 'Failed to fetch listings' });
+    }
+});
+
 export default router;
