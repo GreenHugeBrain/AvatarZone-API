@@ -219,37 +219,30 @@ router.post('/refresh-token', async (req, res) => {
 });
 
 router.get('/api/listings', async (req, res) => {
-    const startPage = 40;
-    const endPage = 55;
-    const sort = 'max_price'; // Sorting by maximum price
-
     try {
-        const allData = [];
-
-        for (let page = startPage; page <= endPage; page++) {
-            const response = await fetch(`${baseUrl}?page=${page}&sort=${sort}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+        // Make the request to the API without pagination and sorting by default
+        const response = await fetch(`${baseUrl}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
+        });
 
-            const data = await response.json();
-            allData.push(...data.results); // Assuming data.results contains the listings
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
         }
 
-        res.json(allData);
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
         console.error('Error fetching listings:', error);
         res.status(500).json({ error: 'Failed to fetch listings' });
     }
 });
+
 
 
 export default router;
