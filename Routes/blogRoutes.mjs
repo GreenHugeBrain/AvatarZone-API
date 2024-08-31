@@ -9,6 +9,8 @@ import { authenticateToken } from '../middleware/authMiddleware.mjs'; // Import 
 const secretKey = 'w5Y;1JOZ~,Ml;Mj0F|Xh)o}Y0f>RWY]s!&7=WLpo|Brqri0f/D{1k$S{"F7&e.:';
 const refreshSecretKey = 'anotherSecretKeyForRefreshTokens';
 const emailConfirmSecretKey = 'differentSecretKeyForEmailConfirmation';
+const apiKey = 'NqsXK0DnQA9zGQu90_vXyVDXnyPJq3qB'; // REAL API KEY 
+const baseUrl = 'https://csfloat.com/api/v1/listings';
 
 const router = Router();
 
@@ -217,23 +219,37 @@ router.post('/refresh-token', async (req, res) => {
 });
 
 router.get('/api/listings', async (req, res) => {
-    const apiKey = 'NqsXK0DnQA9zGQu90_vXyVDXnyPJq3qB'; // REAL API KEY 
-    const url = 'https://csfloat.com/api/v1/listings';
+    const startPage = 40;
+    const endPage = 55;
+    const sort = 'maxprice'; // Sorting by maximum price
 
     try {
-        const response = await axios.get(url, {
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            }
-        });
+        const allData = [];
 
-        // Forward the response data from CSFloat to the client
-        res.json(response.data);
+        for (let page = startPage; page <= endPage; page++) {
+            const response = await fetch(`${baseUrl}?page=${page}&sort=${sort}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+            }
+
+            const data = await response.json();
+            allData.push(...data.results); // Assuming data.results contains the listings
+        }
+
+        res.json(allData);
     } catch (error) {
         console.error('Error fetching listings:', error);
         res.status(500).json({ error: 'Failed to fetch listings' });
     }
 });
+
 
 export default router;
