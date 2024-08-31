@@ -221,7 +221,7 @@ router.post('/refresh-token', async (req, res) => {
 router.get('/api/listings', async (req, res) => {
     const startPage = 40;
     const endPage = 55;
-    const sort = 'maxprice'; // Sorting by maximum price
+    const sort = 'max_price'; // Sorting by maximum price
 
     try {
         const allData = [];
