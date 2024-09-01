@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        validate: {
+        valiString: {
             validator: function(value) {
                 const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
                 return emailRegex.test(value);
@@ -32,23 +32,39 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    basicProductExpire: {
+        type: String,
+        default: null
+    },
     standartProduct: {
         type: Boolean,
         default: false
+    },
+    standartProductExpire: {
+        type: String,
+        default: null
     },
     premiumProduct: {
         type: Boolean,
         default: false
     },
+    premiumProductExpire: {
+        type: String,
+        default: null
+    },
     proProduct: {
         type: Boolean,
         default: false
+    },
+    proProductExpire: {
+        type: String,
+        default: null
     },
     dateOfBirth: {
         type: String,
         required: true
     }
-})
+});
 
 const UserModel = mongoose.model('User', userSchema);
 
