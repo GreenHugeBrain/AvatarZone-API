@@ -113,7 +113,11 @@ router.get('/user-loader', authenticateToken, async (req, res) => {
         res.status(200).json({
             username: user.username,
             email: user.email,
-            dateOfBirth: user.dateOfBirth
+            dateOfBirth: user.dateOfBirth,
+            basic: user.basicProduct,
+            standart: user.standartProduct,
+            premium: user.premiumProduct,
+            pro: user.proProduct
         });
     } catch (error) {
         console.error('Error loading user:', error);
