@@ -133,7 +133,7 @@
         }
     });
 
-    router.post('/adminpanel', authenticateToken, async (req, res) => {
+    router.post('/adminpanel', async (req, res) => {
         try {
             const users = await userSchema.find();
             res.status(200).send(users);
