@@ -134,10 +134,6 @@
     });
 
     router.post('/adminpanel', authenticateToken, async (req, res) => {
-        if (!req.user.isAdmin) {
-            return res.status(403).send('Access denied');
-        }
-
         try {
             const users = await userSchema.find();
             res.status(200).send(users);
